@@ -1,0 +1,20 @@
+<head>
+    <title>{{ .Title }}</title>
+    <meta charset="utf-8">
+    <meta name="description"
+        content="Website meta description for google search results go here" />
+    <meta name="dc.relation" content="{{ .Site.BaseURL }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#1A94D2" />
+    {{- $options := dict "targetPath" "js/bundle.js" -}}
+    {{ $filter := resources.Get "js/filter.ts" | js.Build $options | resources.Minify | fingerprint -}}
+    {{ $api := resources.Get "js/api.ts" | js.Build $options | resources.Minify | fingerprint -}}
+    {{ $main := resources.Get "js/index.ts" | js.Build $options | resources.Minify | fingerprint -}}
+    {{ $js := slice $main $api $filter | resources.Concat "js/bundle.js" | resources.Fingerprint "sha512" }}   
+    <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script> 
+    {{ $options := (dict "targetPath" "css/styles.css" "outputStyle" "compressed") }}
+
+    {{ $style := resources.Get "sass/main.scss" | toCSS  $options | minify }}
+    <link rel="stylesheet" href="{{ $style.RelPermalink }}" media="screen">
+    
+</head>
